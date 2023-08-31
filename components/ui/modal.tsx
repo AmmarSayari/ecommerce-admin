@@ -1,4 +1,4 @@
-"use client";//?
+"use client";
 
 import { 
     Dialog, 
@@ -34,7 +34,7 @@ export const Modal: React.FC<ModalProps> = ({
     };//?
 
     return (
-        <Dialog open={isOpen} onOpenChange={onChange}>//?
+        <Dialog open={isOpen} onOpenChange={onChange}>
             <DialogContent>
                 <DialogHeader>
                     <DialogTitle>
