@@ -12,6 +12,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import { Form, 
     FormControl, 
+    FormDescription, 
     FormField, 
     FormItem, 
     FormLabel, 
@@ -23,11 +24,12 @@ import { Separator } from "@/components/ui/separator";
 import { AlertModal } from "@/components/modals/alert-modal";
 import ImageUpload from "@/components/ui/image-upload";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const formSchema = z.object({
     name: z.string().min(1),
     images: z.object({ url: z.string() }).array(),
-    price: z.number().min(1),
+    price: z.coerce.number().min(1),
     categoryId: z.string().min(1),
     sizeId: z.string().min(1),
     colorId: z.string().min(1),
@@ -86,12 +88,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         try {
             setLoading(true);
             if(initialData){
-                await axios.patch(`/api/${params.storeId}/billboards/${params.billboardId}`, data)
+                await axios.patch(`/api/${params.storeId}/products/${params.productId}`, data)
             }else {
-                await axios.post(`/api/${params.storeId}/billboards`, data)
+                await axios.post(`/api/${params.storeId}/products`, data)
             }
             router.refresh();
-            router.push(`/${params.storeId}/billboards`);
+            router.push(`/${params.storeId}/products`);
             toast.success(toastMessage);
         } catch (error) {
             toast.error("Something went wrong.");
@@ -104,12 +106,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
         try {
             
             setLoading(true);
-            await axios.delete(`/api/${params.storeId}/billboards/${params.billboardId}`);
+            await axios.delete(`/api/${params.storeId}/products/${params.productId}`);
             router.refresh();
-            router.push(`/${params.storeId}/billboards`);
-            toast.success("Billboard deleted.");
+            router.push(`/${params.storeId}/products`);
+            toast.success("Product deleted.");
         } catch (error) {
-            toast.error("Make sure you have no products in this billboard.");
+            toast.error("Something went wrong.");
         } finally {
             setLoading(false);
             setOpen(false);
@@ -166,12 +168,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                     <div className="grid grid-cols-3 gap-8">
                         <FormField
                         control={form.control}
-                        name="price"
+                        name="name"
                         render={({field}) =>(
                             <FormItem>
-                                <FormLabel>Price</FormLabel>
+                                <FormLabel>Name</FormLabel>
                                 <FormControl>
-                                    <Input type="number" disabled={loading} placeholder="Product price" {...field}/>
+                                    <Input disabled={loading} placeholder="Product name" {...field}/>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
@@ -179,12 +181,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                         />
                         <FormField
                         control={form.control}
-                        name="name"
+                        name="price"
                         render={({field}) =>(
                             <FormItem>
-                                <FormLabel>Name</FormLabel>
+                                <FormLabel>Price</FormLabel>
                                 <FormControl>
-                                    <Input disabled={loading} placeholder="Product name" {...field}/>
+                                    <Input type="number" disabled={loading} placeholder="Product price" {...field}/>
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>
@@ -292,6 +294,50 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                                     </SelectContent>
                                 </Select> 
                                 <FormMessage/>
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="isFeatured"
+                        render={({field}) =>(
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                <FormControl>
+                                    <Checkbox 
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <div className="space-y-1 leading-none" >
+                                    <FormLabel>
+                                        Featured
+                                    </FormLabel>
+                                    <FormDescription>
+                                        Featured products will be displayed on the home page.
+                                    </FormDescription>
+                                </div>
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="isArchived"
+                        render={({field}) =>(
+                            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                <FormControl>
+                                    <Checkbox 
+                                        checked={field.value}
+                                        onCheckedChange={field.onChange}
+                                    />
+                                </FormControl>
+                                <div className="space-y-1 leading-none" >
+                                    <FormLabel>
+                                        Archived
+                                    </FormLabel>
+                                    <FormDescription>
+                                        Featured products will not be displayed anywhere in the store.
+                                    </FormDescription>
+                                </div>
                             </FormItem>
                         )}
                         />
