@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import prismadb from "@/lib/prismadb";
 
 export async function GET() {
+  const frontendStoreUrl = process.env.FRONTEND_STORE_URL?.trim();
   const integrations = {
     cloudinary: {
       cloudNameConfigured: Boolean(
@@ -22,6 +23,10 @@ export async function GET() {
       apiKeyConfigured: Boolean(process.env.STRIPE_API_KEY),
       webhookSecretConfigured:
         process.env.STRIPE_WEBHOOK_SECRET?.startsWith("whsec_") ?? false,
+    },
+    storefront: {
+      urlConfigured: Boolean(frontendStoreUrl),
+      hasTrailingSlash: frontendStoreUrl?.endsWith("/") ?? false,
     },
   };
 

@@ -9,11 +9,17 @@ const checkoutSchema = z.object({
   productIds: z.array(z.string().min(1)).min(1).max(50),
 });
 
+function getFrontendStoreUrl() {
+  return (process.env.FRONTEND_STORE_URL ?? "http://localhost:3001")
+    .trim()
+    .replace(/\/+$/, "");
+}
+
 function getCorsHeaders() {
   return {
-  "Access-Control-Allow-Origin": process.env.FRONTEND_STORE_URL ?? "http://localhost:3001",
-  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Origin": getFrontendStoreUrl(),
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
   };
 }
 
@@ -83,8 +89,8 @@ export async function POST(req: Request, props: { params: Promise<{ storeId: str
     phone_number_collection: {
       enabled: true,
     },
-    success_url: `${process.env.FRONTEND_STORE_URL}/cart?success=1`,
-    cancel_url: `${process.env.FRONTEND_STORE_URL}/cart?canceled=1`,
+    success_url: `${getFrontendStoreUrl()}/cart?success=1`,
+    cancel_url: `${getFrontendStoreUrl()}/cart?canceled=1`,
     metadata: {
       orderId: order.id
     },

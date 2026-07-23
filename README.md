@@ -57,6 +57,20 @@ NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
 NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
 ```
 
+In Vercel, enter the key and value in separate fields. Do not include quotes,
+angle brackets, or a second `KEY=` prefix inside the value.
+
+For the restored deployment, the public URL values are:
+
+```text
+FRONTEND_STORE_URL=https://store-mr9.vercel.app
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=dgbkatvnj
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=ued6rvlh
+```
+
+The Cloudinary cloud name and upload preset are different values. The preset is
+the unsigned upload preset created in Cloudinary upload settings.
+
 `FRONTEND_STORE_URL` must be the deployed storefront origin. Configure Stripe
 to send `checkout.session.completed` to:
 
