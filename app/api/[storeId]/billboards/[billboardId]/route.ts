@@ -109,10 +109,27 @@ export async function DELETE(
             return new NextResponse("Unauthorized", { status: 403 });
         }
 
+        const categoryUsingBillboard = await prismadb.category.findFirst({
+            where: {
+                storeId: params.storeId,
+                billboardId: params.billboardId,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (categoryUsingBillboard) {
+            return new NextResponse(
+                "This billboard is still used by a category.",
+                { status: 409 },
+            );
+        }
 
         const billboard = await prismadb.billboard.deleteMany({
             where:{
-                id: params.billboardId
+                id: params.billboardId,
+                storeId: params.storeId,
             }
         });
         return NextResponse.json(billboard);

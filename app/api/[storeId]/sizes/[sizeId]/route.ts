@@ -106,10 +106,27 @@ export async function DELETE(req: Request, props: { params: Promise<{storeId: st
             return new NextResponse("Unauthorized", { status: 403 });
         }
 
+        const productUsingSize = await prismadb.product.findFirst({
+            where: {
+                storeId: params.storeId,
+                sizeId: params.sizeId,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (productUsingSize) {
+            return new NextResponse(
+                "This size is still used by a product.",
+                { status: 409 },
+            );
+        }
 
         const size = await prismadb.size.deleteMany({
             where:{
-                id: params.sizeId
+                id: params.sizeId,
+                storeId: params.storeId,
             }
         });
         return NextResponse.json(size);

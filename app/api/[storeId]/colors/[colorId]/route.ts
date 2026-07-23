@@ -109,10 +109,27 @@ export async function DELETE(
             return new NextResponse("Unauthorized", { status: 403 });
         }
 
+        const productUsingColor = await prismadb.product.findFirst({
+            where: {
+                storeId: params.storeId,
+                colorId: params.colorId,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (productUsingColor) {
+            return new NextResponse(
+                "This color is still used by a product.",
+                { status: 409 },
+            );
+        }
 
         const color = await prismadb.color.deleteMany({
             where:{
-                id: params.colorId
+                id: params.colorId,
+                storeId: params.storeId,
             }
         });
         return NextResponse.json(color);

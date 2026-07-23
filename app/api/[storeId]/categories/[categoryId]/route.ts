@@ -112,10 +112,27 @@ export async function DELETE(
             return new NextResponse("Unauthorized", { status: 403 });
         }
 
+        const productUsingCategory = await prismadb.product.findFirst({
+            where: {
+                storeId: params.storeId,
+                categoryId: params.categoryId,
+            },
+            select: {
+                id: true,
+            },
+        });
+
+        if (productUsingCategory) {
+            return new NextResponse(
+                "This category is still used by a product.",
+                { status: 409 },
+            );
+        }
 
         const category = await prismadb.category.deleteMany({
             where:{
-                id: params.categoryId
+                id: params.categoryId,
+                storeId: params.storeId,
             }
         });
         return NextResponse.json(category);
