@@ -1,10 +1,10 @@
 "use client";
 
 import * as z from "zod";
-import { use, useState } from "react";
-import { Category, Color, Image, Product, Size } from "@prisma/client";
+import { useState } from "react";
+import { Category, Color, Image, Product, Size } from "@/generated/prisma/client";
 import { Trash } from "lucide-react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import axios from "axios";
@@ -29,7 +29,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 const formSchema = z.object({
     name: z.string().min(1),
     images: z.object({ url: z.string() }).array(),
-    price: z.coerce.number().min(1),
+    price: z.number().min(1),
     categoryId: z.string().min(1),
     sizeId: z.string().min(1),
     colorId: z.string().min(1),
@@ -186,7 +186,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({
                             <FormItem>
                                 <FormLabel>Price</FormLabel>
                                 <FormControl>
-                                    <Input type="number" disabled={loading} placeholder="Product price" {...field}/>
+                                    <Input
+                                        type="number"
+                                        disabled={loading}
+                                        placeholder="Product price"
+                                        {...field}
+                                        onChange={(event) => field.onChange(event.target.valueAsNumber)}
+                                    />
                                 </FormControl>
                                 <FormMessage/>
                             </FormItem>

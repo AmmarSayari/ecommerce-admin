@@ -5,11 +5,12 @@ import prismadb from "@/lib/prismadb";
 import { BillboardsClient } from "./components/client";
 import { BillboardColumn } from "./components/columns";
 
-const BillboardsPage = async ({
-    params
-}:{
-    params: {storeId: string}
-}) => {
+const BillboardsPage = async (
+    props:{
+        params: Promise<{storeId: string}>
+    }
+) => {
+    const params = await props.params;
     const billboards = await prismadb.billboard.findMany({
         where: {
             storeId: params.storeId

@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { ImagePlus, Trash } from "lucide-react";
 import Image from "next/image";
-import { CldUploadWidget } from "next-cloudinary"
+import {
+    CldUploadWidget,
+    type CloudinaryUploadWidgetResults,
+} from "next-cloudinary"
 
 import { Button } from "@/components/ui/button";
 
@@ -26,8 +29,12 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         setIsMounted(true);
     }, []);
     
-    const onUpload = (result: any) => {
-        onChange(result.info.secure_url);
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
+    const onUpload = (result: CloudinaryUploadWidgetResults) => {
+        if (typeof result.info === "object" && "secure_url" in result.info) {
+            onChange(result.info.secure_url);
+        }
     }
 
     if (!isMounted) return null;
@@ -45,6 +52,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                         </div>
                         <Image 
                             fill
+                            sizes="200px"
                             className="object-cover"
                             alt="Image"
                             src={url}
@@ -52,7 +60,10 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     </div>
                 ))}
             </div>
-            <CldUploadWidget onUpload={onUpload} uploadPreset="ued6rvlh">
+            <CldUploadWidget
+                onSuccess={onUpload}
+                uploadPreset={uploadPreset ?? ""}
+            >
                 {({open}) => {
                     const onClick = () => {
                         open();
@@ -60,7 +71,8 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     return (
                         <Button
                             type="button"
-                            disabled={disabled}
+                            disabled={disabled || !uploadPreset}
+                            title={!uploadPreset ? "Cloudinary upload preset is not configured" : undefined}
                             variant="secondary"
                             onClick={onClick}
                         >

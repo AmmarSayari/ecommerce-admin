@@ -2,23 +2,28 @@ import Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import prismadb from "@/lib/prismadb";
 
 export async function POST(req: Request) {
     const body = await req.text();
-    const signature = headers().get("stripe-signature") as string
+    const signature = (await headers()).get("stripe-signature");
+
+    if (!signature || !process.env.STRIPE_WEBHOOK_SECRET) {
+      return new NextResponse("Webhook is not configured", { status: 503 });
+    }
 
     let event: Stripe.Event
 
     try {
-        event = stripe.webhooks.constructEvent(
+        event = getStripe().webhooks.constructEvent(
           body,
           signature,
-          process.env.STRIPE_WEBHOOK_SECRET!
+          process.env.STRIPE_WEBHOOK_SECRET
         )
-      } catch (error: any) {
-        return new NextResponse(`Webhook Error: ${error.message}`, { status: 400 })
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Invalid webhook";
+        return new NextResponse(`Webhook Error: ${message}`, { status: 400 })
       }
 
 
@@ -33,13 +38,19 @@ export async function POST(req: Request) {
         address?.postal_code,
         address?.country
       ];
-      const addressString = addressComponents.filter((c) => c !== null).join(', ');
+      const addressString = addressComponents.filter(Boolean).join(', ');
 
 
       if (event.type === "checkout.session.completed") {
+        const orderId = session.metadata?.orderId;
+
+        if (!orderId) {
+          return new NextResponse("Missing order metadata", { status: 400 });
+        }
+
         const order = await prismadb.order.update({
           where: {
-            id: session?.metadata?.orderId,
+            id: orderId,
           },
           data: {
             isPaid: true,

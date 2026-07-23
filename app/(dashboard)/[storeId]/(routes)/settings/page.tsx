@@ -1,6 +1,6 @@
 import prismadb from "@/lib/prismadb";
 
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
 import { SettingsForm } from "./components/settings-form";
@@ -12,10 +12,9 @@ interface SettingsPageProps{
 };
 
 
-const SettingsPage: React.FC<SettingsPageProps> = async ({
-    params
-}) => {
-    const {userId} = auth();
+const SettingsPage: React.FC<SettingsPageProps> = async props => {
+    const params = await props.params;
+    const {userId} = await auth();
 
     if(!userId){
         redirect("/sign-in");

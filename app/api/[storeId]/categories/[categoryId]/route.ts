@@ -1,13 +1,14 @@
 import prismadb from "@/lib/prismadb";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
-export async function PATCH (
+export async function PATCH(
     req: Request,
-    { params }: { params: {storeId: string , categoryId: string}}
+    props: { params: Promise<{storeId: string , categoryId: string}>}
 ) {
+    const params = await props.params;
     try {
-        const {userId} = auth();
+        const {userId} = await auth();
         const body = await req.json();
 
         const { name, billboardId } = body;
@@ -59,10 +60,8 @@ export async function PATCH (
 
 ///////
 
-export async function GET (
-    req: Request,
-    { params }: { params: {categoryId: string}}
-) {
+export async function GET(req: Request, props: { params: Promise<{categoryId: string}>}) {
+    const params = await props.params;
     try {
         if(!params.categoryId){
             return new NextResponse("Category ID is required", { status: 400 });
@@ -86,12 +85,13 @@ export async function GET (
 
 //////
 
-export async function DELETE (
+export async function DELETE(
     req: Request,
-    { params }: { params: {storeId: string, categoryId: string}}
+    props: { params: Promise<{storeId: string, categoryId: string}>}
 ) {
+    const params = await props.params;
     try {
-        const {userId} = auth();
+        const {userId} = await auth();
       
         if(!userId){
             return new NextResponse("Unauthenticated", { status: 401 });

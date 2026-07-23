@@ -1,10 +1,10 @@
 "use client";
 
 import * as z from "zod";
-import { use, useState } from "react";
-import { Size } from "@prisma/client";
+import { useState } from "react";
+import { Size } from "@/generated/prisma/client";
 import { Trash } from "lucide-react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import axios from "axios";
@@ -21,7 +21,6 @@ import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
 import { AlertModal } from "@/components/modals/alert-modal";
-import ImageUpload from "@/components/ui/image-upload";
 
 const formSchema = z.object({
     name: z.string().min(1),

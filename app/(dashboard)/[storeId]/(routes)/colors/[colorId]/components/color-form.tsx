@@ -1,10 +1,10 @@
 "use client";
 
 import * as z from "zod";
-import { use, useState } from "react";
-import { Color } from "@prisma/client";
+import { useState } from "react";
+import { Color } from "@/generated/prisma/client";
 import { Trash } from "lucide-react";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import axios from "axios";
