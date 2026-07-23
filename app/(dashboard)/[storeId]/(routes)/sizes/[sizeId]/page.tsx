@@ -7,11 +7,13 @@ const SizePage = async (
     }
 ) => {
     const params = await props.params;
-    const size = await prismadb.size.findUnique({
-        where: {
-            id: params.sizeId
-        }
-    });
+    const size = params.sizeId === "new"
+        ? null
+        : await prismadb.size.findUnique({
+            where: {
+                id: params.sizeId
+            }
+        });
 
 
     return (

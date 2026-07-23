@@ -6,7 +6,7 @@ import Image from "next/image";
 import {
     CldUploadWidget,
     type CloudinaryUploadWidgetResults,
-} from "next-cloudinary"
+} from "next-cloudinary";
 
 import { Button } from "@/components/ui/button";
 
@@ -29,7 +29,9 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
         setIsMounted(true);
     }, []);
     
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
     const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+    const isCloudinaryConfigured = Boolean(cloudName && uploadPreset);
 
     const onUpload = (result: CloudinaryUploadWidgetResults) => {
         if (typeof result.info === "object" && "secure_url" in result.info) {
@@ -60,28 +62,40 @@ const ImageUpload: React.FC<ImageUploadProps> = ({
                     </div>
                 ))}
             </div>
-            <CldUploadWidget
-                onSuccess={onUpload}
-                uploadPreset={uploadPreset ?? ""}
-            >
-                {({open}) => {
-                    const onClick = () => {
-                        open();
-                    }
-                    return (
-                        <Button
-                            type="button"
-                            disabled={disabled || !uploadPreset}
-                            title={!uploadPreset ? "Cloudinary upload preset is not configured" : undefined}
-                            variant="secondary"
-                            onClick={onClick}
-                        >
-                            <ImagePlus className="h-4 w-4 mr-2"/>
-                            Upload image
-                        </Button>
-                    )
-                }}
-            </CldUploadWidget>
+            {isCloudinaryConfigured ? (
+                <CldUploadWidget
+                    onSuccess={onUpload}
+                    uploadPreset={uploadPreset}
+                    config={{ cloud: { cloudName } }}
+                >
+                    {({open}) => {
+                        const onClick = () => {
+                            open();
+                        }
+                        return (
+                            <Button
+                                type="button"
+                                disabled={disabled}
+                                variant="secondary"
+                                onClick={onClick}
+                            >
+                                <ImagePlus className="h-4 w-4 mr-2"/>
+                                Upload image
+                            </Button>
+                        )
+                    }}
+                </CldUploadWidget>
+            ) : (
+                <Button
+                    type="button"
+                    disabled
+                    title="Cloudinary upload is not configured"
+                    variant="secondary"
+                >
+                    <ImagePlus className="h-4 w-4 mr-2"/>
+                    Upload image
+                </Button>
+            )}
         </div>
     )
 };

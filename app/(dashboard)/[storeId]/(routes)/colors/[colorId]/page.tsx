@@ -7,11 +7,13 @@ const ColorPage = async (
     }
 ) => {
     const params = await props.params;
-    const color = await prismadb.color.findUnique({
-        where: {
-            id: params.colorId
-        }
-    });
+    const color = params.colorId === "new"
+        ? null
+        : await prismadb.color.findUnique({
+            where: {
+                id: params.colorId
+            }
+        });
 
 
     return (

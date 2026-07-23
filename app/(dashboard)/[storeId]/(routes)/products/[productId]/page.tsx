@@ -7,15 +7,16 @@ const ProductPage = async (
     }
 ) => {
     const params = await props.params;
-    const product = await prismadb.product.findUnique({
-        where: {
-            id: params.productId
-        },
-        include: {
-            images: true
-        }
-
-    });
+    const product = params.productId === "new"
+        ? null
+        : await prismadb.product.findUnique({
+            where: {
+                id: params.productId
+            },
+            include: {
+                images: true
+            }
+        });
 
     const categories = await prismadb.category.findMany({
         where: {
